@@ -323,8 +323,12 @@ class DatabaseApiIntegration:
         if self.database_system == "postgresql":
             if hasattr(self.connect_module, "__libpq_version__"):
                 libpq_version = self.connect_module.__libpq_version__
+            elif hasattr(self.connect_module, "pq"):
+                 libpq_version = self.connect_module.pq.__build_version__
             else:
-                libpq_version = self.connect_module.pq.__build_version__
+                # This is probably psycopg3 with connection pooling
+                import psycopg
+                libpq_version = psycopg.pq.version()
             commenter_data.update(
                 {
                     "libpq_version": libpq_version,
